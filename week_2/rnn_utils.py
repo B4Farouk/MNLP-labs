@@ -93,14 +93,12 @@ class RNN_language_model(torch.nn.Module):
     def forward(self, context):
         context = context.t() # transposing it for RNN model
         #context = [src len, batch size]
-        
         embedded = self.dropout(self.embedding(context))
-        
         #embedded = [src len, batch size, emb dim]
-        
         outputs, hidden = self.rnn(embedded)
         #outputs = [src len, batch size, hidden_dim * n directions]
         #hidden = [n layers * n directions, batch size, hid dim]
+        
         outputs = self.lm_decoder(outputs.permute(1, 0, 2))[:, :-1, :].permute(0, 2, 1)
         target_tokens = context.t()[:, 1:]
         loss = self.criterion(input=outputs, target=target_tokens)
